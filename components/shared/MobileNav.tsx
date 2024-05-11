@@ -12,6 +12,7 @@ const MobileNav = () => {
   const pathname = usePathname();
 
   return (
+    // The classname header has lg:hidden which means it only shows the mobile nav sidebar when the screen is small
     <header className='header'>
       <Link
         href='/'
