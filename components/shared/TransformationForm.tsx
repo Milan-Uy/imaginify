@@ -13,9 +13,9 @@ import { aspectRatioOptions, creditFee, defaultValues, transformationTypes } fro
 import { CustomField } from './CustomField';
 import { useEffect, useState, useTransition } from 'react';
 import { AspectRatioKey, debounce, deepMergeObjects } from '@/lib/utils';
-import { updateCredits } from '@/lib/actions/user.actions';
 import MediaUploader from './MediaUploader';
 import TransformedImage from './TransformedImage';
+import { updateCredits } from '@/lib/actions/user.actions';
 import { getCldImageUrl } from 'next-cloudinary';
 import { addImage, updateImage } from '@/lib/actions/image.actions';
 import { useRouter } from 'next/navigation';
@@ -139,7 +139,6 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
   };
 
   const onInputChangeHandler = (fieldName: string, value: string, type: string, onChangeField: (value: string) => void) => {
-    // debounce adds a delay to the function call
     debounce(() => {
       setNewTransformation((prevState: any) => ({
         ...prevState,
@@ -148,9 +147,9 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
           [fieldName === 'prompt' ? 'prompt' : 'to']: value,
         },
       }));
+    }, 1000)();
 
-      return onChangeField(value);
-    }, 1000);
+    return onChangeField(value);
   };
 
   const onTransformHandler = async () => {
@@ -165,7 +164,6 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
     });
   };
 
-  // This enables to use the apply transformation button after the image is uploaded for restore and remove because it only has a single input field
   useEffect(() => {
     if (image && (type === 'restore' || type === 'removeBackground')) {
       setNewTransformation(transformationType.config);
@@ -199,7 +197,10 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
             formLabel='Aspect Ratio'
             className='w-full'
             render={({ field }) => (
-              <Select onValueChange={(value) => onSelectFieldHandler(value, field.onChange)}>
+              <Select
+                onValueChange={(value) => onSelectFieldHandler(value, field.onChange)}
+                value={field.value}
+              >
                 <SelectTrigger className='select-field'>
                   <SelectValue placeholder='Select size' />
                 </SelectTrigger>
@@ -268,6 +269,7 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
               />
             )}
           />
+
           <TransformedImage
             image={image}
             type={type}
@@ -285,7 +287,7 @@ const TransformationForm = ({ action, data = null, userId, type, creditBalance, 
             disabled={isTransforming || newTransformation === null}
             onClick={onTransformHandler}
           >
-            {isTransforming ? 'Transforming...' : 'Apply transformation'}
+            {isTransforming ? 'Transforming...' : 'Apply Transformation'}
           </Button>
           <Button
             type='submit'
